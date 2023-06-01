@@ -14,12 +14,14 @@ empDB=[
  {
  'id':'101',
  'name':'Saravanan S',
- 'title':'Technical Leader'
+ 'title':'Technical Leader',
+ 'salary':'10000'
  },
  {
  'id':'201',
  'name':'Rajkumar P',
- 'title':'Sr Software Engineer'
+ 'title':'Sr Software Engineer',
+ 'salary':'10000'
  }
  ]
 
@@ -30,6 +32,8 @@ def getAllEmp():
 @app.route('/empdb/employee/<empId>',methods=['GET'])
 def getEmp(empId):
     usr = [ emp for emp in empDB if (emp['id'] == empId) ] 
+    if len(usr) == 0:
+        return {'error':'No employee found'}
     return jsonify({'emp':usr})
 
 
@@ -44,9 +48,14 @@ def updateEmp(empId):
 
         if 'title' in request.json:
             em[0]['title'] = request.json['title']
+            
+        if 'salary' in request.json:
+            em[0]['salary'] = request.json['salary']
+            
+    else:
+        return {'error':'No employee found'}
 
     return jsonify(em)
-
 
 @app.route('/empdb/employee',methods=['POST'])
 def createEmp():
@@ -58,6 +67,16 @@ def createEmp():
     }
     empDB.append(dat)
     return jsonify(dat)
+
+@app.route('/empdb/avgsalary',methods=['GET'])
+def getavg():
+    em = [ emp for emp in empDB ]
+    sum = 0
+    for e in em:
+        sum += int(e['salary'])
+    sum /= len(em)
+    return jsonify({'average':str(sum)})
+    
 
 @app.route('/empdb/employee/<empId>',methods=['DELETE'])
 def deleteEmp(empId):
